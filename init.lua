@@ -2,12 +2,10 @@
 vim.api.nvim_set_keymap("i", "jk", "<Esc>", { noremap = true })
 
 vim.opt.clipboard = "unnamedplus"
-
-
 vim.wo.relativenumber = true
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
-vim.opt.shiftwidth = 2
+vim.opt.shiftwidth = 1
 vim.opt.expandtab = true
 vim.opt.textwidth = 80
 
@@ -116,6 +114,14 @@ require('lazy').setup({
     },
   },
 
+      {
+      'windwp/nvim-autopairs',
+      event = 'InsertEnter',
+      config = function()
+        require('nvim-autopairs').setup{}
+      end
+    },
+
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim',  opts = {} },
   {
@@ -211,6 +217,7 @@ require('lazy').setup({
       "rcarriga/nvim-notify",
     },
     opts = {
+      lang="python3",
       description = {
         width = "40%", ---@type string | integer
       },
@@ -259,6 +266,7 @@ require('lazy').setup({
     end,
 
      config = function()
+
     vim.g.firenvim_config = {
       -- config values, like in my case:
       localSettings = {
