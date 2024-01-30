@@ -40,9 +40,8 @@ vim.g.maplocalleader = ' '
 vim.g.maplocalleader = ' '
 
 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
--- Install package manager
---    https://github.com/folke/lazy.nvim
---    `:help lazy.nvim.txt` for more info
+
+vim.api.nvim_set_keymap('n', '<leader><space>', '<cmd>FineCmdline<CR>', { noremap = true })
 
 vim.api.nvim_set_keymap('n', '<leader>1', ':LcRun<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>2', ':LcConsole<CR>', { noremap = true, silent = true })
@@ -78,6 +77,10 @@ require('lazy').setup({
   'tpope/vim-dadbod',
 
   'kristijanhusak/vim-dadbod-ui',
+  {
+    'VonHeikemen/fine-cmdline.nvim',
+  },
+
 
 
   -- NOTE: This is where your plugins related to LSP can be installed.
@@ -113,13 +116,13 @@ require('lazy').setup({
       'rafamadriz/friendly-snippets',
     },
   },
-      {
-      'windwp/nvim-autopairs',
-      event = 'InsertEnter',
-      config = function()
-        require('nvim-autopairs').setup{}
-      end
-    },
+  {
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    config = function()
+      require('nvim-autopairs').setup {}
+    end
+  },
 
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim',  opts = {} },
@@ -216,7 +219,7 @@ require('lazy').setup({
       "rcarriga/nvim-notify",
     },
     opts = {
-      lang="python3",
+      lang = "python3",
       description = {
         width = "40%", ---@type string | integer
       },
@@ -264,17 +267,16 @@ require('lazy').setup({
       vim.fn["firenvim#install"](0)
     end,
 
-     config = function()
-
-    vim.g.firenvim_config = {
-      -- config values, like in my case:
-      localSettings = {
-        [".*"] = {
-          takeover = "never",
+    config = function()
+      vim.g.firenvim_config = {
+        -- config values, like in my case:
+        localSettings = {
+          [".*"] = {
+            takeover = "never",
+          },
         },
-      },
-    }
-  end
+      }
+    end
   },
 
   {
