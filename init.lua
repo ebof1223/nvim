@@ -41,7 +41,7 @@ vim.g.maplocalleader = ' '
 
 vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
 
-vim.api.nvim_set_keymap('n', '<leader><space>', '<cmd>FineCmdline<CR>', { noremap = true })
+vim.api.nvim_set_keymap('n', '<leader><space>', ':terminal<CR>', { noremap = true })
 
 vim.api.nvim_set_keymap('n', '<leader>1', ':LcRun<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>2', ':LcConsole<CR>', { noremap = true, silent = true })
@@ -80,9 +80,6 @@ require('lazy').setup({
   {
     'VonHeikemen/fine-cmdline.nvim',
   },
-
-
-
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
   {
@@ -253,7 +250,7 @@ require('lazy').setup({
     config = function()
       require("nvim-tree").setup {}
       vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<cr>", { noremap = true, silent = true })
-      vim.api.nvim_set_keymap("n", "<C-b>", ":wincmd w<CR>", { noremap = true, silent = true })
+      vim.api.nvim_set_keymap("n", "<C-n>", ":wincmd w<CR>", { noremap = true, silent = true })
     end,
   },
 
@@ -621,29 +618,10 @@ cmp.setup {
     ['<C-p>'] = cmp.mapping.select_prev_item(),
     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete {},
-    ['<CR>'] = cmp.mapping.confirm {
+    ['<C-Space>'] = cmp.mapping.confirm {
       behavior = cmp.ConfirmBehavior.Replace,
       select = true,
     },
-    ['<Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_locally_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
-    ['<S-Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      elseif luasnip.locally_jumpable(-1) then
-        luasnip.jump(-1)
-      else
-        fallback()
-      end
-    end, { 'i', 's' }),
   },
   sources = {
     { name = 'nvim_lsp' },
