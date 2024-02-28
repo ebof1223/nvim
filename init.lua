@@ -1,55 +1,97 @@
---reach-my custom mappengs -- es
+-- Escape from insert mode by typing 'jk'
 vim.api.nvim_set_keymap("i", "jk", "<Esc>", { noremap = true })
 
+-- Share the Neovim clipboard with the system clipboard
 vim.opt.clipboard = "unnamedplus"
+
+-- Enable relative line numbers
 vim.wo.relativenumber = true
+-- keep 18 lines of context around the cursor when scrolling
+vim.opt.scrolloff = 18
+
+-- Set the number of spaces a tab character represents
 vim.opt.tabstop = 2
+-- Set the number of spaces inserted for a tab in insert mode
 vim.opt.softtabstop = 2
-vim.opt.shiftwidth = 1
+-- Convert tabs to spaces
 vim.opt.expandtab = true
+
+-- Set the number of spaces to use for each step of (auto)indent
+vim.opt.shiftwidth = 1
+-- Set the maximum width of text before it wraps
 vim.opt.textwidth = 80
 
+-- Highlight matches as you type during search
 vim.opt.incsearch = true
+
+-- Do not highlight all matches after search
 vim.opt.hlsearch = false
 
-vim.opt.scrolloff = 18
-vim.signcolumn = "yes"
-vim.opt.updatetime = 50
+-- Set delay time for triggering plugins and showing messages in milliseconds
+vim.opt.updatetime = 300
 
+-- Display a vertical line at column 80 as a guide
 vim.opt.colorcolumn = "80"
+--    Always show the sign column
+vim.opt.signcolumn = "yes"
 
---thank you ThePrimeagen
+-- Move selected lines down with 'J' in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+-- Move selected lines up with 'K' in visual mode
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
-vim.keymap.set("x", "<leader>p", "\"_dP")
 
-vim.keymap.set("i", "<C-c>", "<Esc>")
-
+-- Disable the 'Q' command in normal mode (Ex mode)
 vim.keymap.set("n", "Q", "<nop>")
 
-
-vim.keymap.set("n", "<C-f>", "<cmd>silent !tmux neww tmux-sessionizer<CR>")
-vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
---
--- Set <space> as the leader key
--- See `:help mapleader`
---  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
+-- Set <space> as the global leader key and local leader key
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-vim.g.maplocalleader = ' '
-vim.g.maplocalleader = ' '
 
-vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
+-- disabled nvim suspension
+vim.api.nvim_set_keymap('n', '<C-z>', '<Nop>', { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap('n', '<leader><space>', ':terminal<CR>', { noremap = true })
+-- Remap Escape to act like Ctrl+C
+vim.api.nvim_set_keymap('i', '<Esc>', '<C-c>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Esc>', '<C-c>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<Esc>', '<C-c>', { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap('n', '<leader>1', ':LcRun<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>2', ':LcConsole<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>3', ':LcSubmit<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>4', ':LcMenu<CR>', { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>ee", ":LcDescriptionToggle<CR>", { noremap = true, silent = true })
-
+-- Disable Copilot with <leader>x
 vim.keymap.set("n", "<leader>x", ":Copilot disable<CR>", { noremap = true, silent = true })
+
+-- disable netrw at the very start of your init.lua
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- set termguicolors to enable highlight groups
+vim.opt.termguicolors = true
+
+-- Make line numbers default
+vim.wo.number = true
+
+-- Save undo history
+vim.o.undofile = true
+
+-- Case-insensitive searching UNLESS \C or capital in search
+vim.o.ignorecase = true
+vim.o.smartcase = true
+
+-- Decrease update time
+vim.o.updatetime = 250
+vim.o.timeoutlen = 300
+
+-- Set completeopt to have a better completion experience
+vim.o.completeopt = 'menuone,noselect'
+
+-- NOTE: You should make sure your terminal supports this
+vim.o.termguicolors = true
+
+-- Keymaps for better default experience
+vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+
+-- Remap for dealing with word wrap
+vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
 
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
@@ -70,13 +112,19 @@ vim.opt.rtp:prepend(lazypath)
 --  You can also configure plugins after the setup call,
 --    as they will be available in your neovim runtime.
 require('lazy').setup({
-
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
   'tpope/vim-sleuth',
   'tpope/vim-dadbod',
-
   'kristijanhusak/vim-dadbod-ui',
+
+  {
+    'numToStr/Comment.nvim',
+    lazy = false,
+    config = function()
+      require('Comment').setup()
+    end,
+  },
   {
     'VonHeikemen/fine-cmdline.nvim',
   },
@@ -96,6 +144,24 @@ require('lazy').setup({
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
+    },
+  },
+
+  {
+    "christoomey/vim-tmux-navigator",
+    cmd = {
+      "TmuxNavigateLeft",
+      "TmuxNavigateDown",
+      "TmuxNavigateUp",
+      "TmuxNavigateRight",
+      "TmuxNavigatePrevious",
+    },
+    keys = {
+      { "<c-h>",  "<cmd><C-U>TmuxNavigateLeft<cr>" },
+      { "<c-j>",  "<cmd><C-U>TmuxNavigateDown<cr>" },
+      { "<c-k>",  "<cmd><C-U>TmuxNavigateUp<cr>" },
+      { "<c-l>",  "<cmd><C-U>TmuxNavigateRight<cr>" },
+      { "<c-\\>", "<cmd><C-U>TmuxNavigatePrevious<cr>" },
     },
   },
   {
@@ -121,8 +187,17 @@ require('lazy').setup({
     end
   },
 
+  {
+    'numToStr/Comment.nvim',
+    lazy = false,
+    config = function()
+      require('Comment').setup()
+    end,
+  },
+
+
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',  opts = {} },
+  { 'folke/which-key.nvim', opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -178,8 +253,6 @@ require('lazy').setup({
     },
   },
 
-  -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
   {
@@ -199,28 +272,6 @@ require('lazy').setup({
           return vim.fn.executable 'make' == 1
         end,
       },
-    },
-  },
-  {
-    "kawre/leetcode.nvim",
-    build = ":TSUpdate html",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-telescope/telescope.nvim",
-      "nvim-lua/plenary.nvim", -- required by telescope
-      "MunifTanjim/nui.nvim",
-
-      -- optional
-      "nvim-tree/nvim-web-devicons",
-
-      "rcarriga/nvim-notify",
-    },
-    opts = {
-      lang = "python3",
-      description = {
-        width = "40%", ---@type string | integer
-      },
-      -- configuration goes here
     },
   },
   {
@@ -286,15 +337,12 @@ require('lazy').setup({
           enabled = true,
           auto_refresh = false,
           keymap = {
-            jump_prev = "[[",
-            jump_next = "]]",
-            accept = "<CR>",
-            refresh = "gr",
-            open = "<M-CR>"
+            accept = "<S-y>",
           },
           layout = {
             position = "bottom", -- | top | left | right
-            ratio = 0.4
+            ratio = 0.4,
+
           },
         },
         suggestion = {
@@ -302,89 +350,20 @@ require('lazy').setup({
           auto_trigger = true,
           debounce = 75,
           keymap = {
-            accept = "<C-y>",
+            accept = "<S-y>",
             accept_word = false,
             accept_line = false,
             next = "<C-n]>",
             prev = "<C-p>",
-            dismiss = "<C-]>",
           },
         }
       })
     end,
   }
-  -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
-  --       These are some example plugins that I've included in the kickstart repository.
-  --       Uncomment any of the lines below to enable them.
-
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
-  --    up-to-date with whatever is in the kickstart repo.
-  --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
-  --   { import = 'custom.plugins' },
 }, {})
 
--- [[ Setting options ]]
--- See `:help vim.o`
--- NOTE: You can change these options as you wish!
 
 
--- disable netrw at the very start of your init.lua
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
-
--- set termguicolors to enable highlight groups
-vim.opt.termguicolors = true
-
--- empty setup using defaults
-require("nvim-tree").setup()
-
--- Set highlight on search
-vim.o.hlsearch = false
-
--- Make line numbers default
-vim.wo.number = true
-
--- Enable mouse mode
-vim.o.mouse = 'a'
-
--- Sync clipboard between OS and Neovim.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
-vim.o.clipboard = 'unnamedplus'
-
--- Enable break indent
-vim.o.breakindent = true
-
--- Save undo history
-vim.o.undofile = true
-
--- Case-insensitive searching UNLESS \C or capital in search
-vim.o.ignorecase = true
-vim.o.smartcase = true
-
--- Keep signcolumn on by default
-vim.wo.signcolumn = 'yes'
-
--- Decrease update time
-vim.o.updatetime = 250
-vim.o.timeoutlen = 300
-
--- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
-
--- NOTE: You should make sure your terminal supports this
-vim.o.termguicolors = true
-
--- [[ Basic Keymaps ]]
-
--- Keymaps for better default experience
--- See `:help vim.keymap.set()`
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
-
--- Remap for dealing with word wrap
-vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
-vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -414,8 +393,8 @@ require('telescope').setup {
 pcall(require('telescope').load_extension, 'fzf')
 
 -- See `:help telescope.builtin`
---vim.keymap.set('n', '<leader>pf', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
-vim.keymap.set('n', '<leader>s', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
+vim.keymap.set('n', '<leader>pf', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
+vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
 vim.keymap.set('n', '<leader>/', function()
   -- You can pass additional configuration to telescope to change theme, layout, etc.
   require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
@@ -543,27 +522,23 @@ local on_attach = function(_, bufnr)
     print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
   end, '[W]orkspace [L]ist Folders')
 
-  -- Create a command `:Format` local to the LSP buffer
-  vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
-    vim.lsp.buf.format()
-  end, { desc = 'Format current buffer with LSP' })
+  -- Format on save
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = "*",
+    callback = function()
+      vim.lsp.buf.format()
+    end,
+    desc = "Format on save" -- Move the description inside the options table.
+  })
 end
 
--- Enable the following language servers
---  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
---
---  Add any additional override configuration in the following tables. They will be passed to
---  the `settings` field of the server config. You must look up that documentation yourself.
---
---  If you want to override the default filetypes that your language server will attach to you can
---  define the property 'filetypes' to the map in question.
 local servers = {
-  -- clangd = {},
-  -- gopls = {},
-  -- pyright = {},
-  -- rust_analyzer = {},
-  -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
+  clangd = {},
+  gopls = {},
+  pyright = {},
+  rust_analyzer = {},
+  tsserver = {},
+  html = { filetypes = { 'html', 'twig', 'hbs' } },
 
   lua_ls = {
     Lua = {
@@ -618,7 +593,7 @@ cmp.setup {
     ['<C-p>'] = cmp.mapping.select_prev_item(),
     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.confirm {
+    ['<C-y>'] = cmp.mapping.confirm {
       behavior = cmp.ConfirmBehavior.Replace,
       select = true,
     },
