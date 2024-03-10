@@ -16,7 +16,7 @@ vim.opt.softtabstop = 2
 -- Convert tabs to spaces
 vim.opt.expandtab = true
 
--- Set the number of spaces to use for each step of (auto)indent
+--re Set the number of spaces to use for each step of (auto)indent
 vim.opt.shiftwidth = 1
 -- Set the maximum width of text before it wraps
 vim.opt.textwidth = 80
@@ -42,6 +42,7 @@ vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 
 -- Disable the 'Q' command in normal mode (Ex mode)
 vim.keymap.set("n", "Q", "<nop>")
+vim.keymap.set("n", "q", "<nop>")
 
 -- Set <space> as the global leader key and local leader key
 vim.g.mapleader = ' '
@@ -92,6 +93,12 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
+-- Yank Highlight
+vim.api.nvim_create_autocmd("TextYankPost", {
+  callback = function()
+    vim.highlight.on_yank({ higroup = "IncSearch", timeout = 200 })
+  end,
+})
 
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
@@ -188,6 +195,12 @@ require('lazy').setup({
   },
 
   {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    dependencies = { "nvim-lua/plenary.nvim" },
+  },
+
+  {
     'numToStr/Comment.nvim',
     lazy = false,
     config = function()
@@ -197,7 +210,7 @@ require('lazy').setup({
 
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim', opts = {} },
+  { 'folke/which-key.nvim',                opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -241,18 +254,7 @@ require('lazy').setup({
       },
     },
   },
-
-  {
-    -- Add indentation guides even on blank lines
-    'lukas-reineke/indent-blankline.nvim',
-    -- Enable `lukas-reineke/indent-blankline.nvim`
-    -- See `:help indent_blankline.txt`
-    opts = {
-      char = '┊',
-      show_trailing_blankline_indent = false,
-    },
-  },
-
+  { "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
   {
@@ -282,15 +284,6 @@ require('lazy').setup({
     },
     build = ':TSUpdate',
   },
-
-  {
-    "ThePrimeagen/harpoon",
-    lazy = false,
-    config = function()
-      require("harpoon").setup {}
-    end,
-  },
-
   {
     "nvim-tree/nvim-tree.lua",
     version = "*",
@@ -301,7 +294,7 @@ require('lazy').setup({
     config = function()
       require("nvim-tree").setup {}
       vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<cr>", { noremap = true, silent = true })
-      vim.api.nvim_set_keymap("n", "<C-n>", ":wincmd w<CR>", { noremap = true, silent = true })
+      vim.api.nvim_set_keymap("n", "<C-b>", ":wincmd w<CR>", { noremap = true, silent = true })
     end,
   },
 
@@ -327,7 +320,7 @@ require('lazy').setup({
     end
   },
 
-  {
+  --[[ {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
     event = "InsertEnter",
@@ -359,35 +352,8 @@ require('lazy').setup({
         }
       })
     end,
-  }
+  } ]]
 }, {})
-
-
-
-
--- [[ Highlight on yank ]]
--- See `:help vim.highlight.on_yank()`
-local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
-vim.api.nvim_create_autocmd('TextYankPost', {
-  callback = function()
-    vim.highlight.on_yank()
-  end,
-  group = highlight_group,
-  pattern = '*',
-})
-
--- [[ Configure Telescope ]]
--- See `:help telescope` and `:help telescope.setup()`
-require('telescope').setup {
-  defaults = {
-    mappings = {
-      i = {
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
-      },
-    },
-  },
-}
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
@@ -492,6 +458,24 @@ local on_attach = function(_, bufnr)
   --
   -- In this case, we create a function that lets us more easily define mappings specific
   -- for LSP related items. It sets the mode, buffer and description for us each time.
+
+
+
+  local harpoon = require("harpoon")
+  harpoon:setup()
+
+  vim.keymap.set("n", "<leader>a", function() harpoon:list():append() end)
+  vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+
+  vim.keymap.set("n", "<C-h>", function() harpoon:list():select(1) end)
+  vim.keymap.set("n", "<C-t>", function() harpoon:list():select(2) end)
+  vim.keymap.set("n", "<C-n>", function() harpoon:list():select(3) end)
+  vim.keymap.set("n", "<C-s>", function() harpoon:list():select(4) end)
+
+  -- Toggle previous & next buffers stored within Harpoon list
+  vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
+  vim.keymap.set("n", "<C-S-N>", function() harpoon:list():next() end)
+
   local nmap = function(keys, func, desc)
     if desc then
       desc = 'LSP: ' .. desc
@@ -534,11 +518,8 @@ end
 
 local servers = {
   clangd = {},
-  gopls = {},
-  pyright = {},
+
   rust_analyzer = {},
-  tsserver = {},
-  html = { filetypes = { 'html', 'twig', 'hbs' } },
 
   lua_ls = {
     Lua = {
@@ -605,6 +586,23 @@ cmp.setup {
 }
 
 
+local harpoon = require("harpoon")
+
+-- REQUIRED
+harpoon:setup()
+-- REQUIRED
+
+vim.keymap.set("n", "<leader>a", function() harpoon:list():append() end)
+vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+
+vim.keymap.set("n", "<C-q>", function() harpoon:list():select(1) end)
+vim.keymap.set("n", "<C-w>", function() harpoon:list():select(2) end)
+vim.keymap.set("n", "<C-a>", function() harpoon:list():select(3) end)
+vim.keymap.set("n", "<C-s>", function() harpoon:list():select(4) end)
+
+-- Toggle previous & next buffers stored within Harpoon list
+vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
+vim.keymap.set("n", "<C-S-N>", function() harpoon:list():next() end)
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
