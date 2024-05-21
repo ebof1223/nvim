@@ -4,13 +4,19 @@ vim.api.nvim_set_keymap("i", "jk", "<Esc>", { noremap = true })
 -- Share the Neovim clipboard with the system clipboard
 vim.opt.clipboard = "unnamedplus"
 
+-- Set cursor color to white in insert mode
+vim.api.nvim_set_option('guicursor', "n-v-c:block-Cursor/lCursor-blinkon0,i-ci:ver25-Cursor/lCursor-blinkon0")
+
+-- Set cursor color to white in normal mode
+vim.api.nvim_set_option('guicursor', vim.api.nvim_get_option('guicursor') .. ",a:blinkon0")
+
 -- Enable relative line numbers
 vim.wo.relativenumber = true
 -- keep 18 lines of context around the cursor when scrolling
 vim.opt.scrolloff = 18
 
 -- Set the number of spaces a tab character represents
-vim.opt.tabstop = 2
+vim.opt.tabstop = 4
 -- Set the number of spaces inserted for a tab in insert mode
 vim.opt.softtabstop = 2
 -- Convert tabs to spaces
@@ -124,7 +130,7 @@ require('lazy').setup({
   'tpope/vim-sleuth',
   'tpope/vim-dadbod',
   'kristijanhusak/vim-dadbod-ui',
-
+  "jose-elias-alvarez/null-ls.nvim",
   {
     'numToStr/Comment.nvim',
     lazy = false,
@@ -301,8 +307,6 @@ require('lazy').setup({
   {
     'glacambre/firenvim',
 
-    -- Lazy load firenvim
-    -- Explanation: https://github.com/folke/lazy.nvim/discussions/463#discussioncomment-4819297
     lazy = not vim.g.started_by_firenvim,
     build = function()
       vim.fn["firenvim#install"](0)
@@ -310,7 +314,6 @@ require('lazy').setup({
 
     config = function()
       vim.g.firenvim_config = {
-        -- config values, like in my case:
         localSettings = {
           [".*"] = {
             takeover = "never",
@@ -318,6 +321,7 @@ require('lazy').setup({
         },
       }
     end
+
   },
 
   --[[ {
@@ -518,15 +522,14 @@ end
 
 local servers = {
   clangd = {},
-
   rust_analyzer = {},
-
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
     },
   },
+
 }
 
 -- Setup neovim lua configuration
@@ -569,9 +572,10 @@ cmp.setup {
       luasnip.lsp_expand(args.body)
     end,
   },
+
   mapping = cmp.mapping.preset.insert {
     ['<C-n>'] = cmp.mapping.select_next_item(),
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
+    ['<C-p'] = cmp.mapping.select_prev_item(),
     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-y>'] = cmp.mapping.confirm {
@@ -579,11 +583,20 @@ cmp.setup {
       select = true,
     },
   },
+
   sources = {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
   },
 }
+
+local null_ls = require("null-ls")
+
+null_ls.setup({
+  sources = {
+    null_ls.builtins.formatting.prettier,
+  },
+})
 
 
 local harpoon = require("harpoon")
