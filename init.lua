@@ -1,14 +1,19 @@
 -- Escape from insert mode by typing 'jk'
 vim.api.nvim_set_keymap("i", "jk", "<Esc>", { noremap = true })
-
 -- Share the Neovim clipboard with the system clipboard
 vim.opt.clipboard = "unnamedplus"
 
--- Set cursor color to white in insert mode
-vim.api.nvim_set_option('guicursor', "n-v-c:block-Cursor/lCursor-blinkon0,i-ci:ver25-Cursor/lCursor-blinkon0")
+-- Disable curly braces key mappings
+vim.api.nvim_set_keymap('n', '{', '<Nop>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '}', '<Nop>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '{', '<Nop>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '}', '<Nop>', { noremap = true, silent = true })
 
--- Set cursor color to white in normal mode
-vim.api.nvim_set_option('guicursor', vim.api.nvim_get_option('guicursor') .. ",a:blinkon0")
+-- Disable square brackets key mappings
+vim.api.nvim_set_keymap('n', '[', '<Nop>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', ']', '<Nop>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '[', '<Nop>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', ']', '<Nop>', { noremap = true, silent = true })
 
 -- Enable relative line numbers
 vim.wo.relativenumber = true
@@ -18,12 +23,12 @@ vim.opt.scrolloff = 18
 -- Set the number of spaces a tab character represents
 vim.opt.tabstop = 4
 -- Set the number of spaces inserted for a tab in insert mode
-vim.opt.softtabstop = 2
+vim.opt.softtabstop = 4
 -- Convert tabs to spaces
 vim.opt.expandtab = true
 
 --re Set the number of spaces to use for each step of (auto)indent
-vim.opt.shiftwidth = 1
+vim.opt.shiftwidth = 2
 -- Set the maximum width of text before it wraps
 vim.opt.textwidth = 80
 
@@ -300,7 +305,6 @@ require('lazy').setup({
     config = function()
       require("nvim-tree").setup {}
       vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<cr>", { noremap = true, silent = true })
-      vim.api.nvim_set_keymap("n", "<C-b>", ":wincmd w<CR>", { noremap = true, silent = true })
     end,
   },
 
@@ -384,7 +388,7 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim', 'prisma' },
+  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim', 'prisma', 'java' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = false,
