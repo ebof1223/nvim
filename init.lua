@@ -1,5 +1,6 @@
 -- Escape from insert mode by typing 'jk'
 vim.api.nvim_set_keymap("i", "jk", "<Esc>", { noremap = true })
+--
 -- Share the Neovim clipboard with the system clipboard
 vim.opt.clipboard = "unnamedplus"
 
