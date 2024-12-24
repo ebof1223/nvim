@@ -207,6 +207,20 @@ require('lazy').setup({
     },
   },
   {
+    "lervag/vimtex",
+    config = function()
+      -- Set the PDF viewer to Zathura
+      vim.g.vimtex_view_method = "zathura"
+
+      -- Automatically start the compiler on file write
+      vim.g.vimtex_compiler_start_on_write = 1
+
+      -- Automatically open the PDF viewer after compilation
+      vim.g.vimtex_view_auto = 1
+    end
+  },
+
+  {
     'windwp/nvim-autopairs',
     event = 'InsertEnter',
     config = function()
@@ -252,13 +266,27 @@ require('lazy').setup({
     },
   },
 
+
+  -- {
+  --   -- Theme inspired by Atom
+  --   'navarasu/onedark.nvim',
+  --   priority = 1000,
+  --   config = function()
+  --     vim.cmd.colorscheme 'onedark'
+  --   end,
+  -- },
+
+
+
   {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
+    'projekt0n/github-nvim-theme',
     config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
+      require('github-theme').setup({
+        -- ...
+      })
+
+      vim.cmd('colorscheme  github_dark_default')
+    end
   },
 
   {
